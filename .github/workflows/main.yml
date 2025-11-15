@@ -10,24 +10,41 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4 # Usando la versión más reciente
 
+    # --- Primer Paso: Copiar Archivos (SCP) ---
     - name: Copy files to EC2
-      uses: appleboy/scp-action@v0.1.3
+      uses: appleboy/scp-action@master # Usando @master para obtener las últimas correcciones
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "."
         target: "/home/ec2-user/app"
+        # Opcional: Aumentar timeout para conexiones lentas
+        timeout: 60s 
 
+    # --- Segundo Paso: Ejecutar Comandos Remotos (SSH) ---
     - name: Restart app
-      uses: appleboy/ssh-action@v0.1.3
+      uses: appleboy/ssh-action@master # Usando @master para obtener las últimas correcciones
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
+        # Opcional: Aumentar timeout para comandos largos (ej. npm install)
+        timeout: 120s 
         script: |
+          echo "Iniciando despliegue en la instancia EC2..."
+          
+          # 1. Navegar al directorio de la aplicación
           cd /home/ec2-user/app
+          
+          # 2. Instalar dependencias
+          echo "Ejecutando npm install..."
           npm install --omit=dev
-          pm2 restart all || pm2 start index.js
+          
+          # 3. Reiniciar o iniciar la aplicación con PM2
+          echo "Reiniciando la aplicación con PM2..."
+          pm2 restart all || pm2 start index.js --name "calendar-app-backend"
+          
+          echo "Despliegue completado y aplicación iniciada/reiniciada."
