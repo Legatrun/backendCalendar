@@ -1,12 +1,16 @@
 const express = require('express');
 require('dotenv').config()
 const cors = require('cors')
-const { dbConnection } = require('./database/config');
+const { dbConnection, sequelize } = require('./database/config');
 const path = require('path')
 
 const app = express();
 
 dbConnection()
+
+sequelize.sync({ force: true }).then(() => {
+    console.log('Tables created');
+});
 
 // CORS
 app.use(cors())

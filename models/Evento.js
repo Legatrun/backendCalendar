@@ -1,32 +1,26 @@
-const { Schema, model } = require("mongoose");
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../database/config');
+const Usuario = require('./Usuario');
 
-const EventoSchema = Schema({
+const Evento = sequelize.define('Evento', {
     title: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
     notes: {
-        type: String
+        type: DataTypes.STRING
     },
     start: {
-        type: Date,
-        required: true
+        type: DataTypes.DATE,
+        allowNull: false
     },
     end: {
-        type: Date,
-        required: true
-    },
-    user: {
-        type: Schema.Types.ObjectId,
-        ref: 'Usuario',
-        required: true
+        type: DataTypes.DATE,
+        allowNull: false
     }
-})
+});
 
-EventoSchema.method('toJSON', function () {
-    const { __v, _id, ...object } = this.toObject()
-    object.id = _id;
-    return object
-})
+Usuario.hasMany(Evento, { foreignKey: 'userId' });
+Evento.belongsTo(Usuario, { foreignKey: 'userId' });
 
-module.exports = model('Evento', EventoSchema)
+module.exports = Evento;

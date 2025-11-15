@@ -1,20 +1,26 @@
-const mongoose = require('mongoose')
+const { Sequelize } = require('sequelize');
 
+const sequelize = new Sequelize(
+    process.env.MYSQL_DATABASE,
+    process.env.MYSQL_USER,
+    process.env.MYSQL_PASSWORD,
+    {
+        host: process.env.MYSQL_HOST,
+        dialect: 'mysql'
+    }
+);
 
 const dbConnection = async () => {
-
     try {
-        mongoose.connect(process.env.DB_CNN);
-
-        console.log('DB online')
-
+        await sequelize.authenticate();
+        console.log('Database online');
     } catch (error) {
-        console.log(error)
-        throw new Error('Error al inicial la base')
+        console.error('Unable to connect to the database:', error);
+        throw new Error('Error al inicializar la base de datos');
     }
-
-}
+};
 
 module.exports = {
-    dbConnection
-}
+    dbConnection,
+    sequelize
+};
