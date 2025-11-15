@@ -1,34 +1,34 @@
-const express = require('express');
-require('dotenv').config()
-const cors = require('cors')
-const { dbConnection, sequelize } = require('./database/config');
-const path = require('path')
+const express = require("express");
+require("dotenv").config();
+const cors = require("cors");
+const { dbConnection, sequelize } = require("./database/config");
+const path = require("path");
 
 const app = express();
 
-dbConnection()
+dbConnection();
 
 sequelize.sync({ force: true }).then(() => {
-    console.log('Tables created');
+  console.log("Tables created");
 });
 
 // CORS
-app.use(cors())
+app.use(cors());
 
-app.use(express.static('public'))
+app.use(express.static("public"));
 
 // Lectura y Parseo del body
 
-app.use(express.json())
+app.use(express.json());
 
 //Rutas
-app.use('/api/auth', require('./routes/auth'))
-app.use('/api/events', require('./routes/events'))
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/events", require("./routes/events"));
 
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/public/index.html'))
-})
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/index.html"));
+});
 
 app.listen(process.env.PORT, () => {
-    console.log(`Servidor corriendo en puerto ${process.env.PORT}`)
-})
+  console.log(`Servidor corriendo en puerto ${process.env.PORT}`);
+});
