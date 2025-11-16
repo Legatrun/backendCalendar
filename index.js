@@ -6,14 +6,31 @@ const path = require("path");
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:3000", // Para desarrollo
+  // Tu dominio de CloudFront, siempre con HTTPS
+  "https://de2jp277vqlbw.cloudfront.net",
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
+
 dbConnection();
 
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync().then(() => {
   console.log("Tables created");
 });
 
 // CORS
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use(express.static("public"));
 
